@@ -41,16 +41,12 @@ app.get('/api/books', (req, res) => {
 })
 
 app.post('/api/books', (req, res) => {
-  const schema = {
-    genre: Joi.string().min(3),
-    title: Joi.string().min(3),
-    description: Joi.string().min(3)
-  }
+  // Validate
+  const {error} = validateBook(req.body)
 
-  const result = Joi.validate(req.body, schema)
-
-  if(result.error){
-    res.status(400).send(res.error.details[0].message)
+  // If invalid, return 400 - Bad request
+  if(error){
+    res.status(400).send(error.details[0].message)
     return
   }
 
@@ -70,16 +66,11 @@ app.put('/api/books/:id', (req, res) => {
   if (!book) res.status(404).send('Book with that ID not found.')
 
   // Validate
-  // If invalid, return 400 - Bad request
-  const schema = {
-    genre: Joi.string().min(3),
-    title: Joi.string().min(3),
-    description: Joi.string().min(3)
-  }
+  const {error} = validateBook(req.body)
 
-  const result = Joi.validate(req.body, schema)
-  if(result.error){
-    res.status(400).send(res.error.details[0].message)
+  // If invalid, return 400 - Bad request
+  if(error){
+    res.status(400).send(error.details[0].message)
     return
   }
 
@@ -92,7 +83,16 @@ app.put('/api/books/:id', (req, res) => {
   res.send(book)
 })
 
+function validateBook(book) {
+  // Validate
+  const schema = {
+    genre: Joi.string().min(3),
+    title: Joi.string().min(3),
+    description: Joi.string().min(3)
+  }
 
+  return Joi.validate(book, schema)
+}
 
 app.get('/api/books/:id', (req, res) => {
   const book = books.find(b => b.id === req.params.id)
