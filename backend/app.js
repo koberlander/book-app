@@ -1,12 +1,11 @@
 
-const EventEmitter = require('events');
+const express = require('express');
+const app = express()
 
-const Logger = require('./logger');
-const logger = new Logger()
-
-// Register a listener
-logger.on('messageLogged', (arg) => {
-  console.log('Lisener called', arg);
+app.get('/', (req, res) => {
+  res.send('Hello World')
 })
 
-logger.log('message')
+app.listen(3000, () => {
+  console.log('Listening on port 3000');
+});
