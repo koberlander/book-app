@@ -42,7 +42,9 @@ app.get('/api/books', (req, res) => {
 
 app.post('/api/books', (req, res) => {
   const schema = {
-    genre: Joi.string().min(3)
+    genre: Joi.string().min(3),
+    title: Joi.string().min(3),
+    description: Joi.string().min(3)
   }
 
   const result = Joi.validate(req.body, schema)
@@ -53,21 +55,41 @@ app.post('/api/books', (req, res) => {
   }
 
   const book = {
-    genre: req.body.genre
+    genre: req.body.genre,
+    title: req.body.title,
+    description: req.body.description
   }
   books.push(book)
   res.send(book)
 })
 
 app.put('/api/books/:id', (req, res) => {
-  // Find the book
-  // If no book, return 404
+  // Find the book. If no book, return 404.
+  const book = books.find(b => b.id === req.params.id)
+
+  if (!book) res.status(404).send('Book with that ID not found.')
 
   // Validate
   // If invalid, return 400 - Bad request
+  const schema = {
+    genre: Joi.string().min(3),
+    title: Joi.string().min(3),
+    description: Joi.string().min(3)
+  }
+
+  const result = Joi.validate(req.body, schema)
+  if(result.error){
+    res.status(400).send(res.error.details[0].message)
+    return
+  }
 
   // Update the book
+  book.genre = req.body.genre
+  book.title = req.body.title
+  book.description = req.body.description
+
   // Return the updated book
+  res.send(book)
 })
 
 
