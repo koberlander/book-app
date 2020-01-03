@@ -7,29 +7,29 @@ app.use(express.json())
 // BOOKS TEST DATA
 const books = [
    {
-      'id':  1,
-      'genre': 'book genre 1',
-      'title': 'book title 1',
-      'description': 'description 1'
+      id:  1,
+      genre: 'book genre 1',
+      title: 'book title 1',
+      description: 'description 1'
    },
    {
-      'id':  2,
-      'genre': 'book genre 2',
-      'title': 'book title 2',
-      'description': 'description 2'
+      id:  2,
+      genre: 'book genre 2',
+      title: 'book title 2',
+      description: 'description 2'
    },
    {
-      'id':  3,
-      'genre': 'book genre 3',
-      'title': 'book title 3',
-      'description': 'description 3'
+      id:  3,
+      genre: 'book genre 3',
+      title: 'book title 3',
+      description: 'description 3'
    }
 ]
 
 // DISPLAY ALL BOOKS FROM THE ROOT ADDRESS
-app.get('/', (req, res) => {
-  res.send(books)
-})
+// app.get('/', (req, res) => {
+//   res.send(books)
+// })
 
 // DISPLAY ALL BOOKS
 app.get('/api/books', (req, res) => {
@@ -38,10 +38,8 @@ app.get('/api/books', (req, res) => {
 
 // ADD A NEW BOOK
 app.post('/api/books', (req, res) => {
-  // Validate
+  // Validate. If invalid, return 400 - Bad request
   const {error} = validateBook(req.body)
-
-  // If invalid, return 400 - Bad request
   if(error){
     res.status(400).send(error.details[0].message)
     return
@@ -59,15 +57,13 @@ app.post('/api/books', (req, res) => {
 
 // UPDATE AN EXISTING BOOK
 app.put('/api/books/:id', (req, res) => {
-  // Find the book. If no book, return 404.
-  const book = books.find(b => b.id === req.params.id)
+  // Look up the book. If no book, return 404.
+  const book = books.find(b => b.id === parseInt(req.params.id))
 
-  if (!book) res.status(404).send('Book with that ID not found.')
+  if (!book) return res.status(404).send('Book with that ID not found.')
 
-  // Validate
+  // Validate. If invalid, return 400 - Bad request.
   const {error} = validateBook(req.body)
-
-  // If invalid, return 400 - Bad request
   if(error){
     res.status(400).send(error.details[0].message)
     return
@@ -84,12 +80,22 @@ app.put('/api/books/:id', (req, res) => {
 
 // REMOVE BOOK
 app.delete('api/books/:id', (req, res) => {
-  // DELETE LOGIC WOULD GO HERE
+  // Look up the book. Return a 404 if it doesn't exist.
+  const book = books.find(b => b.id === parseInt(req.params.id))
+
+  if (!book) return res.status(404).send('Book with that ID not found.')
+
+  // Delete
+  const index = books.indexOf(book)
+  books.splice(index, 1)
+
+  // Return the book.
+  res.send(book)
 })
 
 // FIND BOOK BY ID
 app.get('/api/books/:id', (req, res) => {
-  const book = books.find(b => b.id === req.params.id)
+  const book = books.find(b => b.id === parseInt(req.params.id))
 
   if (!book) res.status(404).send('Book with that ID not found.')
 
