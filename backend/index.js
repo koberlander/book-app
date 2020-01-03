@@ -4,6 +4,7 @@ const app = express()
 
 app.use(express.json())
 
+// BOOKS TEST DATA
 const books = [
    {
       'id':  1,
@@ -25,14 +26,17 @@ const books = [
    }
 ]
 
+// DISPLAY ALL BOOKS FROM THE ROOT ADDRESS
 app.get('/', (req, res) => {
   res.send(books)
 })
 
+// DISPLAY ALL BOOKS
 app.get('/api/books', (req, res) => {
   res.send(books)
 })
 
+// ADD A NEW BOOK
 app.post('/api/books', (req, res) => {
   // Validate
   const {error} = validateBook(req.body)
@@ -44,7 +48,7 @@ app.post('/api/books', (req, res) => {
   }
 
   const book = {
-    id: bokks.length + 1,
+    id: books.length + 1,
     genre: req.body.genre,
     title: req.body.title,
     description: req.body.description
@@ -53,6 +57,7 @@ app.post('/api/books', (req, res) => {
   res.send(book)
 })
 
+// UPDATE AN EXISTING BOOK
 app.put('/api/books/:id', (req, res) => {
   // Find the book. If no book, return 404.
   const book = books.find(b => b.id === req.params.id)
@@ -77,8 +82,22 @@ app.put('/api/books/:id', (req, res) => {
   res.send(book)
 })
 
+// REMOVE BOOK
+app.delete('api/books/:id', (req, res) => {
+  // DELETE LOGIC WOULD GO HERE
+})
+
+// FIND BOOK BY ID
+app.get('/api/books/:id', (req, res) => {
+  const book = books.find(b => b.id === req.params.id)
+
+  if (!book) res.status(404).send('Book with that ID not found.')
+
+  res.send(book)
+})
+
+// CHECK TO MAKE SURE BOOK INFO ENTERED IS IN THE CORRECT FORMAT
 function validateBook(book) {
-  // Validate
   const schema = {
     genre: Joi.string().min(3),
     title: Joi.string().min(3),
@@ -87,18 +106,6 @@ function validateBook(book) {
 
   return Joi.validate(book, schema)
 }
-
-app.delete('api/books/:id', (req, res) => {
-  // DELETE LOGIC WOULD GO HERE
-})
-
-app.get('/api/books/:id', (req, res) => {
-  const book = books.find(b => b.id === req.params.id)
-
-  if (!book) res.status(404).send('Book with that ID not found.')
-
-  res.send(book)
-})
 
 // PORT
 const port = process.env.PORT || 3000
