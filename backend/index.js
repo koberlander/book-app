@@ -88,6 +88,10 @@ function validateBook(book) {
   return Joi.validate(book, schema)
 }
 
+app.delete('api/books/:id', (req, res) => {
+  // DELETE LOGIC WOULD GO HERE
+})
+
 app.get('/api/books/:id', (req, res) => {
   const book = books.find(b => b.id === req.params.id)
 
